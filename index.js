@@ -902,9 +902,13 @@ async function sendSong(sock, jid, query) {
       }
       downloaded = { buffer: Buffer.concat(chunks), mimetype: "audio/mpeg" };
     } catch (legacyErr) {
-      throw new Error(`Song download failed. ${ytErr.message || legacyErr.message || "YouTube download error"}`);
+  console.error("YT-DLP ERROR:", ytErr);
+  console.error("YTDL ERROR:", legacyErr);
+
+  throw new Error(
+    `Song download failed. ${ytErr.message || "yt-dlp failed"} | ${legacyErr.message || "ytdl failed"}`
+  );
     }
-  }
 
   const buffer = Buffer.isBuffer(downloaded) ? downloaded : downloaded.buffer;
   const mimetype = (downloaded && downloaded.mimetype) || "audio/mp4";
