@@ -1955,13 +1955,13 @@ Remove: ${getBotPrefix()}dlsudo <number> অথবা reply করে ${getBotPr
       return;
     } else if (command === "owner") {
       // .owner is intentionally text-only: do not attach the owner photo here.
-      await sendBotReply(sock, jid, `🤖 Bot Account: ${getBotAccountName(sock)}\n👑 Owner: ${config.OWNER_NAME}\n📱 ${config.OWNER_NUMBER}`);
+      await sendBotReply(sock, jid, `🤖 Bot Account: ${getBotAccountName(sock)}\n👑 Owner: ${config.OWNER_NAME}\n📱 ${config.OWNER_NUMBER} ${config.CHANNEL_URL}\n`);
     } else if (command === "channel") {
       await sendOwnerPhotoReply(sock, jid, `📢 CHANNEL
 👑 ${config.OWNER_NAME}
 
 নিচের View channel button-এ চাপুন।`, {
-        templateButtons: config.CHANNEL_URL ? [{
+        templateButtons: ${config.CHANNEL_URL} ? [{
           index: 1,
           urlButton: { displayText: "📢 View channel", url: config.CHANNEL_URL }
         }] : []
