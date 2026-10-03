@@ -1536,7 +1536,7 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
     // or private chat and the sender identity is represented as a LID.
 
     const menuText =
-`╭━━━〔 👑 BOSS X VIP MENU 〕━━━╮
+`╭━━━〔 👑 BOSS XMD MENU 〕━━━╮
 │ 👨‍💻 Developer: Mr bikramhacker
 │ 🤖 Account: ${getBotAccountName(sock)}
 │ 👑 ${config.OWNER_NAME}
