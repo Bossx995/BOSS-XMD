@@ -100,3 +100,4 @@ The command publishes the replied content as **WhatsApp Group Status for that gr
 - Added video-to-audio conversion commands: `.tomp3`, `.toaudio`, `.vtoa`, `.video2audio`, `.mp3`. Reply to a video with any of these commands.
 - Owner photo/card previews are disabled for normal command replies.
 - Added `ffmpeg-static` so video/audio conversion does not depend on a system FFmpeg binary.
+\n\n## Promote/Demote action log\n- Use `.pmd on` in a group to enable logs for successful admin promotions/demotions.\n- Use `.pmd off` to disable logs.\n- Logs show the actor and the affected participant; the bot must be present in the group.\n
