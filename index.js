@@ -2676,15 +2676,15 @@ async function startBot() {
           };
           const actorLabel = actionActor ? participantLabel(actionActor) : "অজানা (WhatsApp actor দেয়নি)";
           const targetLabels = changedParticipants.map(p => participantLabel(p));
-          const actionText = action === "promote" ? "ADMIN করা হয়েছে" :
-            action === "demote" ? "ADMIN থেকে সরানো হয়েছে" : "GROUP থেকে REMOVE করা হয়েছে";
+          const actionText = action === "promote" ? "promote" :
+            action === "demote" ? "demote" : "REMOVE MAN";
           const mentions = [...new Set([
             ...(actionActor ? [actionActor] : []),
             ...changedParticipants
           ])];
           const mentionText = mentions.map(jid => `@${baseNumber(jid)}`).join(" ");
           await sock.sendMessage(id, {
-            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${mentions}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText}${mentionText ? `\n\n${mentionText}` : ""}`,
+            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${@mentions}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText}${mentionText ? `\n\n${mentionText}` : ""}`,
             mentions
           });
         } catch (logErr) {
