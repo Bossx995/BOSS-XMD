@@ -35,6 +35,7 @@ const DEFAULT_SETTINGS = {
   antisticker: false,
   antiAdminGroups: {},
   pmdGroups: {},
+  txdgGroups: {},
   antiStickerGroups: {},
   antiStickerCounts: {},
   antiStickerLockedGroups: {},
@@ -76,6 +77,7 @@ if (typeof settings.autoReaction !== "boolean") settings.autoReaction = false;
 if (typeof settings.autoAdmin !== "boolean") settings.autoAdmin = false;
 if (!settings.antiAdminGroups || typeof settings.antiAdminGroups !== "object" || Array.isArray(settings.antiAdminGroups)) settings.antiAdminGroups = {};
 if (!settings.pmdGroups || typeof settings.pmdGroups !== "object" || Array.isArray(settings.pmdGroups)) settings.pmdGroups = {};
+if (!settings.txdgGroups || typeof settings.txdgGroups !== "object" || Array.isArray(settings.txdgGroups)) settings.txdgGroups = {};
 if (!settings.antiStickerGroups || typeof settings.antiStickerGroups !== "object" || Array.isArray(settings.antiStickerGroups)) settings.antiStickerGroups = {};
 if (!settings.antiStickerCounts || typeof settings.antiStickerCounts !== "object" || Array.isArray(settings.antiStickerCounts)) settings.antiStickerCounts = {};
 if (!settings.antiStickerLockedGroups || typeof settings.antiStickerLockedGroups !== "object" || Array.isArray(settings.antiStickerLockedGroups)) settings.antiStickerLockedGroups = {};
@@ -1708,6 +1710,28 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
   }
 
 
+  // .txdg on/off: owner-only group-description change log.
+  if (command === "txdg") {
+    const requesterIsOwner = isOwner(sender) || isOwner(senderPn) || isSelfMessage;
+    if (!requesterIsOwner) {
+      await sendBotReply(sock, jid, "⛔ এই command শুধু BOSS X bot owner ব্যবহার করতে পারবে।");
+      return;
+    }
+    if (!isGroup(jid)) {
+      await sendGroupOnlyReply(sock, jid, `❌ ${getBotPrefix()}txdg on/off শুধু group-এ কাজ করে।`);
+      return;
+    }
+    const value = args[0]?.toLowerCase();
+    if (value !== "on" && value !== "off") {
+      await sendBotReply(sock, jid, `ব্যবহার: ${getBotPrefix()}txdg on অথবা ${getBotPrefix()}txdg off\nবর্তমান অবস্থা: ${settings.txdgGroups?.[jid] === true ? "ON ✅" : "OFF ❌"}`);
+      return;
+    }
+    settings.txdgGroups[jid] = value === "on";
+    saveSettings();
+    await sendBotReply(sock, jid, `📝 *BOSS X GROUP DESCRIPTION LOG*\nStatus: ${value.toUpperCase()} ${value === "on" ? "✅" : "❌"}\n${value === "on" ? "Group description পরিবর্তন হলে কে পরিবর্তন করেছে এবং নতুন description দেখাবে।" : "এই group-এর description log বন্ধ।"}`);
+    return;
+  }
+
   // .pmd on/off: enable or disable promote/demote action logs for this group.
   if (command === "pmd") {
     if (!isGroup(jid)) {
@@ -2666,6 +2690,35 @@ async function startBot() {
         await sock.rejectCall(call.id, call.from);
         await sock.sendMessage(call.from, { text: "🚫 ANTI-CALL: এই bot call গ্রহণ করে না।" });
       } catch (e) { logger.error({ err:e }, "anti-call failed"); }
+    }
+  });
+
+  // TXDG: monitor group description updates. Commands are owner-only; logs are per-group.
+  sock.ev.on("groups.update", async updates => {
+    for (const update of updates || []) {
+      const id = update?.id;
+      if (!isGroup(id) || settings.txdgGroups?.[id] !== true) continue;
+      const hasDescription = Object.prototype.hasOwnProperty.call(update || {}, "desc") ||
+        Object.prototype.hasOwnProperty.call(update || {}, "description");
+      if (!hasDescription) continue;
+      try {
+        const meta = await getGroupMetadataSafe(sock, id);
+        const actorJid = normalizeJid(update?.author || update?.actor || update?.participant || "");
+        const actorBase = baseNumber(actorJid);
+        const actorEntry = (meta?.participants || []).find(p =>
+          baseNumber(p.id || p.jid || p.phoneNumber || p.lid || "") === actorBase
+        );
+        const actorName = actorEntry?.notify || actorEntry?.name || actorEntry?.pushName ||
+          (actorBase ? `+${actorBase}` : "অজানা (WhatsApp actor দেয়নি)");
+        const desc = String(update?.desc ?? update?.description ?? meta?.desc ?? meta?.description ?? "").trim();
+        const mentions = actorJid ? [actorJid] : [];
+        await sock.sendMessage(id, {
+          text: `📝 *BOSS X DESCRIPTION LOG*\n👤 পরিবর্তন করেছে: ${actorName}\n📌 নতুন Group Description:\n${desc || "(খালি করা হয়েছে)"}${actorJid ? `\n\n@${actorBase}` : ""}`,
+          mentions
+        });
+      } catch (err) {
+        logger.warn({ err, id }, "txdg description log failed");
+      }
     }
   });
 
