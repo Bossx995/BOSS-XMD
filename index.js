@@ -1659,6 +1659,7 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
 │ 🔒 ${getBotPrefix()}group close
 │ 🔓 ${getBotPrefix()}open
 │ 🔒 ${getBotPrefix()}close
+│ 🪄 ${getBotPrefix()}pdm
 ╰────────────────────
 ╭─〔 👋 WELCOME / GOODBYE 〕
 │ ✍️ ${getBotPrefix()}setwelcome <message>
@@ -2762,7 +2763,7 @@ async function startBot() {
           ])];
           const mentionText = mentions.map(jid => `@${baseNumber(jid)}`).join(" ");
           await sock.sendMessage(id, {
-            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${actorLabel}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText}${mentionText ? `\n\n${mentionText}` : ""}`,
+            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${actorLabel}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText}promotrd by${mentionText ? `\n\n${mentionText}` : ""}`,
             mentions
           });
         } catch (logErr) {
