@@ -34,6 +34,7 @@ const DEFAULT_SETTINGS = {
   antiadmin: false,
   antisticker: false,
   antiAdminGroups: {},
+  pmdGroups: {},
   antiStickerGroups: {},
   antiStickerCounts: {},
   antiStickerLockedGroups: {},
@@ -74,6 +75,7 @@ if (!Array.isArray(settings.sudoUsers)) { settings.sudoUsers = []; saveSettings(
 if (typeof settings.autoReaction !== "boolean") settings.autoReaction = false;
 if (typeof settings.autoAdmin !== "boolean") settings.autoAdmin = false;
 if (!settings.antiAdminGroups || typeof settings.antiAdminGroups !== "object" || Array.isArray(settings.antiAdminGroups)) settings.antiAdminGroups = {};
+if (!settings.pmdGroups || typeof settings.pmdGroups !== "object" || Array.isArray(settings.pmdGroups)) settings.pmdGroups = {};
 if (!settings.antiStickerGroups || typeof settings.antiStickerGroups !== "object" || Array.isArray(settings.antiStickerGroups)) settings.antiStickerGroups = {};
 if (!settings.antiStickerCounts || typeof settings.antiStickerCounts !== "object" || Array.isArray(settings.antiStickerCounts)) settings.antiStickerCounts = {};
 if (!settings.antiStickerLockedGroups || typeof settings.antiStickerLockedGroups !== "object" || Array.isArray(settings.antiStickerLockedGroups)) settings.antiStickerLockedGroups = {};
@@ -1706,6 +1708,29 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
   }
 
 
+  // .pmd on/off: enable or disable promote/demote action logs for this group.
+  if (command === "pmd") {
+    if (!isGroup(jid)) {
+      await sendGroupOnlyReply(sock, jid, `❌ ${getBotPrefix()}pmd on/off শুধু group-এ কাজ করে।`);
+      return;
+    }
+    const requesterIsAdmin = await getGroupAdmin(sock, jid, sender, senderPn);
+    const requesterIsOwner = isOwner(sender) || isOwner(senderPn) || isSelfMessage;
+    if (!requesterIsAdmin && !requesterIsOwner) {
+      await sendBotReply(sock, jid, "❌ এই command শুধু group admin/owner ব্যবহার করতে পারবে।");
+      return;
+    }
+    const value = argsRaw.trim().toLowerCase();
+    if (value !== "on" && value !== "off") {
+      await sendBotReply(sock, jid, `ℹ️ ব্যবহার: ${getBotPrefix()}pmd on অথবা ${getBotPrefix()}pmd off\nবর্তমান অবস্থা: ${settings.pmdGroups?.[jid] === true ? "ON ✅" : "OFF ❌"}`);
+      return;
+    }
+    settings.pmdGroups[jid] = value === "on";
+    saveSettings();
+    await sendBotReply(sock, jid, `🛡️ *BOSS X PROMOTE/DEMOTE LOG*\nStatus: ${value.toUpperCase()} ${value === "on" ? "✅" : "❌"}\n${value === "on" ? "এখন promote/demote করলে কে করেছে এবং কাকে করেছে—দুজনের নাম দেখাবে।" : "এই group-এর promote/demote log বন্ধ।"}`);
+    return;
+  }
+
   // GROUP ADMIN CONTROLS
   // .promote / .demote: group-admin command. Target can be mentioned or replied to.
   if (command === "promote" || command === "demote") {
@@ -2664,7 +2689,7 @@ async function startBot() {
       // BOSS X: show who performed group admin/removal actions and who was affected.
       // Baileys versions differ on whether the actor is exposed as author or actor.
       const actionActor = normalizeJid(update?.author || update?.actor || "");
-      if (["promote", "demote", "remove"].includes(action) && changedParticipants.length) {
+      if (settings.pmdGroups?.[id] === true && ["promote", "demote"].includes(action) && changedParticipants.length) {
         try {
           const metaForAction = await getGroupMetadataSafe(sock, id);
           const participantLabel = (jid) => {
@@ -2676,15 +2701,15 @@ async function startBot() {
           };
           const actorLabel = actionActor ? participantLabel(actionActor) : "অজানা (WhatsApp actor দেয়নি)";
           const targetLabels = changedParticipants.map(p => participantLabel(p));
-          const actionText = action === "promote" ? "promote" :
-            action === "demote" ? "demote" : "REMOVE MAN";
+          const actionText = action === "promote" ? "ADMIN করা হয়েছে" :
+            action === "demote" ? "ADMIN থেকে সরানো হয়েছে" : "GROUP থেকে REMOVE করা হয়েছে";
           const mentions = [...new Set([
             ...(actionActor ? [actionActor] : []),
             ...changedParticipants
           ])];
           const mentionText = mentions.map(jid => `@${baseNumber(jid)}`).join(" ");
           await sock.sendMessage(id, {
-            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${Bossx}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText}${mentionText ? `\n\n${mentionText}` : ""}`,
+            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${actorLabel}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText}${mentionText ? `\n\n${mentionText}` : ""}`,
             mentions
           });
         } catch (logErr) {
