@@ -2754,8 +2754,8 @@ async function startBot() {
           };
           const actorLabel = actionActor ? participantLabel(actionActor) : "অজানা (WhatsApp actor দেয়নি)";
           const targetLabels = changedParticipants.map(p => participantLabel(p));
-          const actionText = action === "promote" ? "ADMIN করা হয়েছে" :
-            action === "demote" ? "ADMIN থেকে সরানো হয়েছে" : "GROUP থেকে REMOVE করা হয়েছে";
+          const actionText = action === "promote" ? "promote" :
+            action === "demote" ? "demote" : "GROUP থেকে REMOVE করা হয়েছে";
           const mentions = [...new Set([
             ...(actionActor ? [actionActor] : []),
             ...changedParticipants
