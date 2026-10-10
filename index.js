@@ -2661,6 +2661,37 @@ async function startBot() {
       // "@object Object" and WhatsApp cannot create the mention.
       const changedParticipants = normalizeParticipantList(rawParticipants);
 
+      // BOSS X: show who performed group admin/removal actions and who was affected.
+      // Baileys versions differ on whether the actor is exposed as author or actor.
+      const actionActor = normalizeJid(update?.author || update?.actor || "");
+      if (["promote", "demote", "remove"].includes(action) && changedParticipants.length) {
+        try {
+          const metaForAction = await getGroupMetadataSafe(sock, id);
+          const participantLabel = (jid) => {
+            const base = baseNumber(jid);
+            const found = (metaForAction?.participants || []).find(p =>
+              baseNumber(p.id || p.jid || p.phoneNumber || "") === base
+            );
+            return found?.notify || found?.name || found?.pushName || (base ? `+${base}` : "Unknown");
+          };
+          const actorLabel = actionActor ? participantLabel(actionActor) : "অজানা (WhatsApp actor দেয়নি)";
+          const targetLabels = changedParticipants.map(p => participantLabel(p));
+          const actionText = action === "promote" ? "ADMIN করা হয়েছে" :
+            action === "demote" ? "ADMIN থেকে সরানো হয়েছে" : "GROUP থেকে REMOVE করা হয়েছে";
+          const mentions = [...new Set([
+            ...(actionActor ? [actionActor] : []),
+            ...changedParticipants
+          ])];
+          const mentionText = mentions.map(jid => `@${baseNumber(jid)}`).join(" ");
+          await sock.sendMessage(id, {
+            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${actorLabel}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText}${mentionText ? `\n\n${mentionText}` : ""}`,
+            mentions
+          });
+        } catch (logErr) {
+          logger.warn({ err: logErr, id, action }, "admin action log failed");
+        }
+      }
+
       logger.info({
         id,
         action,
