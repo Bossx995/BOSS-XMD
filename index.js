@@ -1543,7 +1543,7 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
   const noArgCommands = new Set(["ping", "menu", "help", "owner"]);
   if (noArgCommands.has(command) && argsRaw.trim()) return;
 
-  // Show a temporary ⌛ reaction while a command is processing. It is removed
+  // Show a temporary 🪄 reaction while a command is processing. It is removed
   // automatically after a command reply/media result succeeds.
   await setProcessingReaction(sock, jid, msg.key);
   const canUsePrivateMode =
@@ -1680,13 +1680,20 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯`;
 
     try {
-      // VIP menu card: keep the View channel button ONLY on .menu/.help.
-      // Keep .menu reliable across current Baileys versions.
-      // templateButtons are not supported consistently and can make the
-      // entire menu send fail. The menu photo/text is intentionally sent
-      // without templateButtons; the normal channel URL is still shown in
-      // the menu text when configured.
-      await sendMenuPhotoReply(sock, jid, menuText);
+      // VIP menu card: attach a single View channel button to .menu/.help.
+      // The outer catch preserves a text-menu fallback if sending fails.
+      // Keep the existing command menu, with only one channel button beneath it.
+      // If this Baileys/client combination rejects templateButtons, the catch
+      // below still sends the menu as plain text so .menu/.help keep working.
+      await sendMenuPhotoReply(sock, jid, menuText, {
+        templateButtons: config.CHANNEL_URL ? [{
+          index: 1,
+          urlButton: {
+            displayText: "📢 View channel",
+            url: config.CHANNEL_URL
+          }
+        }] : []
+      });
     } catch (e) {
       logger.error({ err: e, jid, sender }, "menu send failed");
       try {
@@ -2757,7 +2764,7 @@ async function startBot() {
           ])];
           const mentionText = mentions.map(jid => `@${baseNumber(jid)}`).join(" ");
           await sock.sendMessage(id, {
-            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${actorLabel}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText} by ${mentionText by?`\n\n${mentionText}` : ""}`,
+            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${actorLabel}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText}${mentionText ? `\n\n${mentionText}` : ""}`,
             mentions
           });
         } catch (logErr) {
