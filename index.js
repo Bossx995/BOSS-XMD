@@ -1650,18 +1650,13 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
 │ 👁️ ${getBotPrefix()}lol (reply)
 │ 🗑️ ${getBotPrefix()}de (reply)
 │ 🗑️ ${getBotPrefix()}del (reply)
-│ 🗑️ ${getBotPrefix()}delete (reply)
 │ 🔗 ${getBotPrefix()}link
-│ 🔗 ${getBotPrefix()}grouplink
 │ ♻️ ${getBotPrefix()}linkreset
 │ ♻️ ${getBotPrefix()}resetlink
-│ 🔓 ${getBotPrefix()}group open
-│ 🔒 ${getBotPrefix()}group close
 │ 🔓 ${getBotPrefix()}open
 │ 🔒 ${getBotPrefix()}close
-│ 🪄 ${getBotPrefix()}pdm
-╰────────────────────
-╭─〔 👋 WELCOME / GOODBYE 〕
+│ 🪄 ${getBotPrefix()}pmd
+│ 🤖 ${getBotPrefix()}autoreaction on/off
 │ ✍️ ${getBotPrefix()}setwelcome <message>
 │ ✍️ ${getBotPrefix()}setgoodbye <message>
 ╰────────────────────
@@ -1677,7 +1672,6 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
 ╭─〔 👑 OWNER / SUDO 〕
 │ 🔐 ${getBotPrefix()}setsudo <number> / reply
 │ 🗑️ ${getBotPrefix()}dlsudo <number> / reply
-│ 🤖 ${getBotPrefix()}autoreaction on/off
 │ 👑 ${getBotPrefix()}autoadmin on/off
 │ 🌙 ${getBotPrefix()}goodnight
 │ 🌙 ${getBotPrefix()}gn
@@ -2125,7 +2119,7 @@ Remove: ${getBotPrefix()}dlsudo <number> অথবা reply করে ${getBotPr
         const value = args[1]?.toLowerCase();
         if (["antilink", "anti-link", "antiadmin", "antisticker"].includes(feature)) {
           if (!isGroup(jid)) {
-            await sendGroupOnlyReply(sock, jid, `❌ ${feature} ❌𝓣𝓱𝓲𝓼 𝓬𝓸𝓶𝓶𝓪𝓷𝓭 𝔀𝓸𝓻𝓴𝓼 𝓲𝓷 𝓰𝓻𝓸𝓾𝓹`);
+            await sendGroupOnlyReply(sock, jid, `❌ ${feature} 𝓣𝓱𝓲𝓼 𝓬𝓸𝓶𝓶𝓪𝓷𝓭 𝔀𝓸𝓻𝓴𝓼 𝓲𝓷 𝓰𝓻𝓸𝓾𝓹`);
           } else if (!["on", "off"].includes(value)) {
             await sendBotReply(sock, jid, `Usage: ${getBotPrefix()}settings ${feature} on/off`);
           } else {
@@ -2167,7 +2161,7 @@ ${getBotPrefix()}antistatus kick on/off`);
       }
     } else if (["antiadmin", "antisticker"].includes(command)) {
       if (!isGroup(jid)) {
-        await sendGroupOnlyReply(sock, jid, `❌ ${command} ❌𝓣𝓱𝓲𝓼 𝓬𝓸𝓶𝓶𝓪𝓷𝓭 𝔀𝓸𝓻𝓴𝓼 𝓲𝓷 𝓰𝓻𝓸𝓾𝓹`);
+        await sendGroupOnlyReply(sock, jid, `❌ ${command} 𝓣𝓱𝓲𝓼 𝓬𝓸𝓶𝓶𝓪𝓷𝓭 𝔀𝓸𝓻𝓴𝓼 𝓲𝓷 𝓰𝓻𝓸𝓾𝓹`);
       } else {
         const value = args[0]?.toLowerCase();
         if (!["on", "off"].includes(value)) {
@@ -2186,7 +2180,7 @@ ${getBotPrefix()}antistatus kick on/off`);
         await sendBotReply(sock, jid, `Usage: .${command} on/off`);
       } else if (command === "antilink") {
         if (!isGroup(jid)) {
-          await sendGroupOnlyReply(sock, jid, `❌ ${command} ❌𝓣𝓱𝓲𝓼 𝓬𝓸𝓶𝓶𝓪𝓷𝓭 𝔀𝓸𝓻𝓴𝓼 𝓲𝓷 𝓰𝓻𝓸𝓾𝓹`);
+          await sendGroupOnlyReply(sock, jid, `❌ ${command} 𝓣𝓱𝓲𝓼 𝓬𝓸𝓶𝓶𝓪𝓷𝓭 𝔀𝓸𝓻𝓴𝓼 𝓲𝓷 𝓰𝓻𝓸𝓾𝓹`);
           return;
         }
         const enabled = value === "on";
@@ -2247,9 +2241,9 @@ ${getBotPrefix()}antistatus kick on/off`);
           );
           await sock.sendMessage(jid, {
             image: buffer,
-            caption: qm.imageMessage.caption || `🖼️ Full photo • BOSS X ${getBotPrefix()}lol`
+            caption: qm.imageMessage.caption || `🖼️ • BOSS X ${getBotPrefix()}lol`
           });
-          await sendBotReply(sock, jid, "🖼️ View-once photo Full  ✅");
+          await sendBotReply(sock, jid, "🖼️ ✅");
         } catch (e) {
           await sendBotReply(sock, jid, `❌ ${getBotPrefix()}lol failed: ${e.message || "photo পাওয়া যায়নি"}`);
         }
@@ -2763,7 +2757,7 @@ async function startBot() {
           ])];
           const mentionText = mentions.map(jid => `@${baseNumber(jid)}`).join(" ");
           await sock.sendMessage(id, {
-            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${actorLabel}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText}promotrd by${mentionText ? `\n\n${mentionText}` : ""}`,
+            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${actorLabel}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText} by${mentionText by?`\n\n${mentionText}` : ""}`,
             mentions
           });
         } catch (logErr) {
