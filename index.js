@@ -2757,7 +2757,7 @@ async function startBot() {
           ])];
           const mentionText = mentions.map(jid => `@${baseNumber(jid)}`).join(" ");
           await sock.sendMessage(id, {
-            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${actorLabel}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText} by${mentionText by?`\n\n${mentionText}` : ""}`,
+            text: `🛡️ *BOSS X ADMIN LOG*\n👤 কাজটি করেছে: ${actorLabel}\n🎯 যার উপর কাজ হয়েছে: ${targetLabels.join(", ")}\n⚙️ Action: ${actionText} by ${mentionText by?`\n\n${mentionText}` : ""}`,
             mentions
           });
         } catch (logErr) {
