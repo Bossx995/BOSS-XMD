@@ -3,7 +3,7 @@ module.exports = {
   MODE: process.env.BOT_MODE || "private", // private = owner-only, public = members can use normal commands
   OWNER_NAME: process.env.OWNER_NAME || "『𝑴𝒓 𝑩𝒊𝒌𝒓𝒂𝒎𝒉𝒂𝒄𝒌𝒆𝒓』",
   OWNER_NUMBER: process.env.OWNER_NUMBER || "919123827995",
-  CHANNEL_ID: process.env.CHANNEL_ID || "120363412006298804@newsletter",
+  CHANNEL_ID: process.env.CHANNEL_ID || "https://whatsapp.com/channel/0029VbDqHfKKQuJMRHZzZX11",
   CHANNEL_NAME: process.env.CHANNEL_NAME || "BOSS X",
   CHANNEL_URL: process.env.CHANNEL_URL || "https://whatsapp.com/channel/0029VbDqHfKKQuJMRHZzZX11",
   WELCOME_PHOTO: process.env.WELCOME_PHOTO || "welcome.jpg",
