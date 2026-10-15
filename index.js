@@ -1677,16 +1677,38 @@ if (command === "menu" || command === "help") {
 
 > © BOSS X • YOUR BROTHER ❤️`;
 
+  
   try {
-    await sendBotReply(sock, jid, menuText);
+    const botNumber = sock.user?.id;
+    let botPhoto = null;
+
+    if (botNumber) {
+      try {
+        botPhoto = await sock.profilePictureUrl(botNumber, "image");
+      } catch (photoErr) {
+        logger.warn("Bot profile photo not available");
+      }
+    }
+
+    if (botPhoto) {
+      await sock.sendMessage(jid, {
+        image: { url: botPhoto },
+        caption: menuText,
+        contextInfo: {
+          externalAdReply: {
+            title: "👑 BOSS X MENU",
+            body: "⚡ BOSS X • YOUR BROTHER ❤️",
+            mediaType: 1,
+            renderLargerThumbnail: true
+          }
+        }
+      });
+    } else {
+      await sendBotReply(sock, jid, menuText);
+    }
   } catch (err) {
     logger.error({ err, jid }, "Menu send failed");
   }
-
-  await clearProcessingReaction(sock, jid);
-  return;
-}
-
   
   if (mode === "private" && !canUsePrivateMode) {
     console.log(`⛔ COMMAND BLOCKED: ${command} from ${sender}`);
