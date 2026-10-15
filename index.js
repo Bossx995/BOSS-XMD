@@ -1588,58 +1588,91 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
   // from the paired WhatsApp account. This is intentionally limited to
   // self/owner/sudo identities and does not make `.menu` public.
   
+
 if (command === "menu" || command === "help") {
   const uptime = Math.floor(process.uptime());
   const hours = Math.floor(uptime / 3600);
   const minutes = Math.floor((uptime % 3600) / 60);
   const seconds = uptime % 60;
+  const prefix = getBotPrefix();
 
   const menuText =
 `╭━━━〔 👑 BOSS X MENU 〕━━━╮
 │ 👑 OWNER: ${config.OWNER_NAME}
-│ 📚 COMMANDS: All Commands
 │ ⏱️ RUNTIME: ${hours}h ${minutes}m ${seconds}s
-│ 📦 PREFIX: ${getBotPrefix()}
-│ ⚙️ MODE: ${mode}
+│ 📦 PREFIX: ${prefix}
 │ 🏷️ VERSION: 1.6.0
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
 ╭━━━〔 📋 GENERAL 〕━━━╮
-│ 🏓 ${getBotPrefix()}ping
-│ 📋 ${getBotPrefix()}menu
-│ ❓ ${getBotPrefix()}help
-│ 👑 ${getBotPrefix()}owner
-│ 📢 ${getBotPrefix()}channel
-│ ⚙️ ${getBotPrefix()}settings
-│ 🆘 ${getBotPrefix()}supportg
-│ 🔧 ${getBotPrefix()}setprefix
-│ 🔐 ${getBotPrefix()}mode
+│ ${prefix}ping
+│ ${prefix}menu
+│ ${prefix}help
+│ ${prefix}owner
+│ ${prefix}channel
+│ ${prefix}settings
+│ ${prefix}supportg
+│ ${prefix}setprefix
+│ ${prefix}mode
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
 ╭━━━〔 🛡️ SECURITY 〕━━━╮
-│ anticall, antibot, antidelete
-│ anticlean, antiadmin, antisticker
-│ antimention, antitag, antistatus
-│ antilink, botadd, botdel
+│ ${prefix}anticall
+│ ${prefix}antibot
+│ ${prefix}antidelete
+│ ${prefix}anticlean
+│ ${prefix}antiadmin
+│ ${prefix}antisticker
+│ ${prefix}antimention
+│ ${prefix}antitag
+│ ${prefix}antistatus
+│ ${prefix}antilink
+│ ${prefix}botadd
+│ ${prefix}botdel
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
 ╭━━━〔 👥 GROUP 〕━━━╮
-│ lft, atag, promote, demote
-│ allpmte, vgroup, gf, kick
-│ kickall, htag, tagall, totag
-│ lol, de, del, link, linkreset
-│ resetlink, open, close, pmd
-│ setwelcome, setgoodbye
+│ ${prefix}lft
+│ ${prefix}atag
+│ ${prefix}promote
+│ ${prefix}demote
+│ ${prefix}allpmte
+│ ${prefix}vgroup
+│ ${prefix}gf
+│ ${prefix}kick
+│ ${prefix}kickall
+│ ${prefix}htag
+│ ${prefix}tagall
+│ ${prefix}totag
+│ ${prefix}lol
+│ ${prefix}de
+│ ${prefix}del
+│ ${prefix}link
+│ ${prefix}linkreset
+│ ${prefix}resetlink
+│ ${prefix}open
+│ ${prefix}close
+│ ${prefix}pmd
+│ ${prefix}setwelcome
+│ ${prefix}setgoodbye
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
 ╭━━━〔 🎵 MEDIA 〕━━━╮
-│ song, play, tomp3, toaudio
-│ vv3, mwhatsapp, gcstory, hack
+│ ${prefix}song
+│ ${prefix}play
+│ ${prefix}tomp3
+│ ${prefix}vv3
+│ ${prefix}mwhatsapp
+│ ${prefix}gcstory
+│ ${prefix}hack
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
 ╭━━━〔 👑 OWNER / SUDO 〕━━━╮
-│ setsudo, dlsudo, autoadmin
-│ goodnight, gn, autoreaction
+│ ${prefix}setsudo
+│ ${prefix}dlsudo
+│ ${prefix}autoadmin
+│ ${prefix}gn
+│ ${prefix}autoreaction
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
 > © BOSS X • YOUR BROTHER ❤️`;
@@ -1658,7 +1691,6 @@ if (command === "menu" || command === "help") {
     });
   } catch (err) {
     logger.error({ err, jid }, "Menu send failed");
-    await sendBotReply(sock, jid, menuText);
   }
 
   await clearProcessingReaction(sock, jid);
