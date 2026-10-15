@@ -1690,25 +1690,133 @@ if (command === "menu" || command === "help") {
       }
     }
 
+if (command === "menu" || command === "help") {
+  const uptime = Math.floor(process.uptime());
+  const hours = Math.floor(uptime / 3600);
+  const minutes = Math.floor((uptime % 3600) / 60);
+  const seconds = uptime % 60;
+  const prefix = getBotPrefix();
+
+  const menuText =
+`╭━━━〔 👑 BOSS X MENU 〕━━━╮
+│ 👑 OWNER: ${config.OWNER_NAME}
+│ ⏱️ RUNTIME: ${hours}h ${minutes}m ${seconds}s
+│ 📦 PREFIX: ${prefix}
+│ 🏷️ VERSION: 1.6.0
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+╭━━━〔 📋 GENERAL 〕━━━╮
+│ ${prefix}ping
+│ ${prefix}menu
+│ ${prefix}help
+│ ${prefix}owner
+│ ${prefix}channel
+│ ${prefix}settings
+│ ${prefix}supportg
+│ ${prefix}setprefix
+│ ${prefix}mode
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+╭━━━〔 🛡️ SECURITY 〕━━━╮
+│ ${prefix}anticall
+│ ${prefix}antibot
+│ ${prefix}antidelete
+│ ${prefix}anticlean
+│ ${prefix}antiadmin
+│ ${prefix}antisticker
+│ ${prefix}antimention
+│ ${prefix}antitag
+│ ${prefix}antistatus
+│ ${prefix}antilink
+│ ${prefix}botadd
+│ ${prefix}botdel
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+╭━━━〔 👥 GROUP 〕━━━╮
+│ ${prefix}lft
+│ ${prefix}atag
+│ ${prefix}promote
+│ ${prefix}demote
+│ ${prefix}allpmte
+│ ${prefix}vgroup
+│ ${prefix}gf
+│ ${prefix}kick
+│ ${prefix}kickall
+│ ${prefix}htag
+│ ${prefix}tagall
+│ ${prefix}totag
+│ ${prefix}lol
+│ ${prefix}de
+│ ${prefix}del
+│ ${prefix}link
+│ ${prefix}linkreset
+│ ${prefix}resetlink
+│ ${prefix}open
+│ ${prefix}close
+│ ${prefix}pmd
+│ ${prefix}setwelcome
+│ ${prefix}setgoodbye
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+╭━━━〔 🎵 MEDIA 〕━━━╮
+│ ${prefix}song
+│ ${prefix}play
+│ ${prefix}tomp3
+│ ${prefix}vv3
+│ ${prefix}mwhatsapp
+│ ${prefix}gcstory
+│ ${prefix}hack
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+╭━━━〔 👑 OWNER / SUDO 〕━━━╮
+│ ${prefix}setsudo
+│ ${prefix}dlsudo
+│ ${prefix}autoadmin
+│ ${prefix}gn
+│ ${prefix}autoreaction
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+> © BOSS X • YOUR BROTHER ❤️`;
+
+  try {
+    let botPhoto = null;
+    const botNumber = sock.user?.id;
+
+    if (botNumber) {
+      try {
+        botPhoto = await sock.profilePictureUrl(
+          botNumber,
+          "image"
+        );
+      } catch (photoErr) {
+        logger.warn("Bot profile photo not available");
+      }
+    }
+
     if (botPhoto) {
       await sock.sendMessage(jid, {
         image: { url: botPhoto },
-        caption: menuText,
-        contextInfo: {
-          externalAdReply: {
-            title: "👑 BOSS X MENU",
-            body: "⚡ BOSS X • YOUR BROTHER ❤️",
-            mediaType: 1,
-            renderLargerThumbnail: true
-          }
-        }
+        caption: menuText
       });
     } else {
       await sendBotReply(sock, jid, menuText);
     }
+
+    // Send the channel URL separately so the link remains available.
+    if (config.CHANNEL_URL) {
+      await sendBotReply(
+        sock,
+        jid,
+        `📢 BOSS X CHANNEL\n${config.CHANNEL_URL}`
+      );
+    }
   } catch (err) {
     logger.error({ err, jid }, "Menu send failed");
   }
+
+  await clearProcessingReaction(sock, jid);
+  return;
+}
   
   if (mode === "private" && !canUsePrivateMode) {
     console.log(`⛔ COMMAND BLOCKED: ${command} from ${sender}`);
