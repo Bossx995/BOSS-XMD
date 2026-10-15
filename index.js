@@ -1590,14 +1590,22 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
     // This also makes `.menu` reliable when the command is sent from a group
     // or private chat and the sender identity is represented as a LID.
 
+    const uptimeSeconds = Math.floor(process.uptime());
+    const uptimeHours = Math.floor(uptimeSeconds / 3600);
+    const uptimeMinutes = Math.floor((uptimeSeconds % 3600) / 60);
+    const uptimeRemainder = uptimeSeconds % 60;
+    const runtimeText = `${uptimeHours}h ${uptimeMinutes}m ${uptimeRemainder}s`;
     const menuText =
 `╭━━━〔 👑 BOSS X MENU 〕━━━╮
-│ 👨‍💻 Developer: Mr bikramhacker
-│ 🤖 Account: ${getBotAccountName(sock)}
-│ 👑 ${config.OWNER_NAME}
+│ 👑 OWNER: ${config.OWNER_NAME}
+│ 📚 COMMANDS: .menu / .help
+│ ⏱️ RUNTIME: ${runtimeText}
+│ 📦 PREFIX: ${getBotPrefix()}
+│ ⚙️ MODE: ${config.MODE || "public"}
+│ 🏷️ VERSION: ${require("./package.json").version}
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
-╭─〔 ⚡ 𝐆𝐄𝐍𝐄𝐑𝐀𝐋 〕
-│ 🧰 BASIC
+
+╭━━━〔 📋 GENERAL COMMANDS 〕━━━╮
 │ 🏓 ${getBotPrefix()}ping
 │ 📋 ${getBotPrefix()}menu
 │ ❓ ${getBotPrefix()}help
@@ -1605,83 +1613,22 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
 │ 📢 ${getBotPrefix()}channel
 │ ⚙️ ${getBotPrefix()}settings
 │ 🆘 ${getBotPrefix()}supportg
-│ 🔧 ${getBotPrefix()}setprefix <prefix>
-│ 🔧 ${getBotPrefix()}prefix <prefix>
-│ 🔐 ${getBotPrefix()}mode private/public
-╰────────────────────
-╭─〔 🛡️ SECURITY 〕
-│ 📞 ${getBotPrefix()}anticall on/off
-│ 🤖 ${getBotPrefix()}antibot on/off
-│ ♻️ ${getBotPrefix()}antidelete on/off
-│ 🧹 ${getBotPrefix()}anticlean on/off
-│ 👮 ${getBotPrefix()}antiadmin on/off
-│ 🧹 ${getBotPrefix()}antisticker on/off
-│ 🏷️ ${getBotPrefix()}antimention on/off
-│ 🏷️ ${getBotPrefix()}antitag on/off
-│ 🚨 ${getBotPrefix()}antistatus on/off
-│ 👢 ${getBotPrefix()}antistatus kick on/off
-│ 🔗 ${getBotPrefix()}antilink on/off
-│ 🤖 ${getBotPrefix()}botadd <number>
-│ 🗑️ ${getBotPrefix()}botdel <number>
-╰────────────────────
-╭─〔 👥 GROUP 〕
-│ 🚪 ${getBotPrefix()}lft
-│ 👑 ${getBotPrefix()}atag
-│ 👑 ${getBotPrefix()}promote @user / reply
-│ 👑 ${getBotPrefix()}demote @user / reply
-│ 👑 ${getBotPrefix()}allpmte
-│ 📣 ${getBotPrefix()}vgroup <time>
-│ ℹ️ ${getBotPrefix()}gf
-│ 👢 ${getBotPrefix()}kick @user / reply
-│ 💥 ${getBotPrefix()}kickall
-│ 📢 ${getBotPrefix()}htag
-│ 🏷️ ${getBotPrefix()}tagall
-│ 🏷️ ${getBotPrefix()}totag (reply)
-│ 👁️ ${getBotPrefix()}lol (reply)
-│ 🗑️ ${getBotPrefix()}de (reply)
-│ 🗑️ ${getBotPrefix()}del (reply)
-│ 🔗 ${getBotPrefix()}link
-│ ♻️ ${getBotPrefix()}linkreset
-│ ♻️ ${getBotPrefix()}resetlink
-│ 🔓 ${getBotPrefix()}open
-│ 🔒 ${getBotPrefix()}close
-│ 🪄 ${getBotPrefix()}pmd
-│ 🤖 ${getBotPrefix()}autoreaction on/off
-│ ✍️ ${getBotPrefix()}setwelcome <message>
-│ ✍️ ${getBotPrefix()}setgoodbye <message>
-╰────────────────────
-╭─〔🎵 MEDIA 〕
-│ 🎧 ${getBotPrefix()}song <name>
-│ ▶️ ${getBotPrefix()}play <name>
-│ 🎙️ ${getBotPrefix()}tomp3 / ${getBotPrefix()}toaudio (reply video)
-│ ⚠️ ${getBotPrefix()}vv3 (view-once bypass unavailable)
-│ 📢 ${getBotPrefix()}mwhatsapp (safe notification only)
-│ 📖 ${getBotPrefix()}gcstory (reply)
-│ 💻 ${getBotPrefix()}hack [1-100]
-╰────────────────────
-╭─〔 👑 OWNER / SUDO 〕
-│ 🔐 ${getBotPrefix()}setsudo <number> / reply
-│ 🗑️ ${getBotPrefix()}dlsudo <number> / reply
-│ 👑 ${getBotPrefix()}autoadmin on/off
-│ 🌙 ${getBotPrefix()}goodnight
-│ 🌙 ${getBotPrefix()}gn
-╰────────────────────
-> © BOSS X • YOUR BROTHER ♥️
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯`;
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+> © BOSS X • YOUR BROTHER ♥️`;
 
     try {
-      // VIP menu card: attach a single View channel button to .menu/.help.
-      // The outer catch preserves a text-menu fallback if sending fails.
-      // Keep the existing command menu, with only one channel button beneath it.
-      // If this Baileys/client combination rejects templateButtons, the catch
-      // below still sends the menu as plain text so .menu/.help keep working.
-      // Prefer a reliable plain-text menu reply; image/template-button support
-      // varies across Baileys forks and can cause the menu to appear unresponsive.
-      await sendBotReply(sock, jid, menuText);
+      // Normal menu with a single View channel button. If this Baileys build
+      // rejects template buttons, the fallback below still returns the menu.
+      await sendBotReply(sock, jid, menuText, {
+        templateButtons: config.CHANNEL_URL ? [{
+          index: 1,
+          urlButton: { displayText: "📢 View channel", url: config.CHANNEL_URL }
+        }] : []
+      });
     } catch (e) {
       logger.error({ err: e, jid, sender }, "menu send failed");
       try {
-        await sock.sendMessage(jid, { text: menuText });
+        await sock.sendMessage(jid, { text: `${menuText}\n\n📢 View channel: ${config.CHANNEL_URL || ""}` });
       } catch (fallbackError) {
         logger.error({ err: fallbackError, jid }, "menu fallback send failed");
       }
