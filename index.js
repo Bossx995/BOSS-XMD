@@ -1587,28 +1587,24 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
   // BASIC self commands must always reach the dispatcher when they come
   // from the paired WhatsApp account. This is intentionally limited to
   // self/owner/sudo identities and does not make `.menu` public.
-  if (command === "menu" || command === "help") {
-    // Menu/help are harmless BASIC commands, so they must never be blocked by
-    // private command mode. Owner/admin-only commands remain protected below.
-    // This also makes `.menu` reliable when the command is sent from a group
-    // or private chat and the sender identity is represented as a LID.
+  
+if (command === "menu" || command === "help") {
+  const uptime = Math.floor(process.uptime());
+  const hours = Math.floor(uptime / 3600);
+  const minutes = Math.floor((uptime % 3600) / 60);
+  const seconds = uptime % 60;
 
-    const uptimeSeconds = Math.floor(process.uptime());
-    const uptimeHours = Math.floor(uptimeSeconds / 3600);
-    const uptimeMinutes = Math.floor((uptimeSeconds % 3600) / 60);
-    const uptimeRemainder = uptimeSeconds % 60;
-    const runtimeText = `${uptimeHours}h ${uptimeMinutes}m ${uptimeRemainder}s`;
-    const menuText =
+  const menuText =
 `╭━━━〔 👑 BOSS X MENU 〕━━━╮
 │ 👑 OWNER: ${config.OWNER_NAME}
-│ 📚 COMMANDS: .menu / .help
-│ ⏱️ RUNTIME: ${runtimeText}
+│ 📚 COMMANDS: All Commands
+│ ⏱️ RUNTIME: ${hours}h ${minutes}m ${seconds}s
 │ 📦 PREFIX: ${getBotPrefix()}
-│ ⚙️ MODE: ${config.MODE || "public"}
-│ 🏷️ VERSION: ${require("./package.json").version}
+│ ⚙️ MODE: ${mode}
+│ 🏷️ VERSION: 1.6.0
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
-╭━━━〔 📋 GENERAL COMMANDS 〕━━━╮
+╭━━━〔 📋 GENERAL 〕━━━╮
 │ 🏓 ${getBotPrefix()}ping
 │ 📋 ${getBotPrefix()}menu
 │ ❓ ${getBotPrefix()}help
@@ -1616,19 +1612,60 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
 │ 📢 ${getBotPrefix()}channel
 │ ⚙️ ${getBotPrefix()}settings
 │ 🆘 ${getBotPrefix()}supportg
+│ 🔧 ${getBotPrefix()}setprefix
+│ 🔐 ${getBotPrefix()}mode
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
-> © BOSS X • YOUR BROTHER ♥️`;
 
-    // Reliable plain-text menu: avoid unsupported templateButtons that can
-    // fail on some Baileys/WhatsApp builds. WhatsApp auto-links the channel URL.
-    const channelLine = config.CHANNEL_URL
-      ? `\n\n📢 View channel: ${config.CHANNEL_URL}`
-      : "";
-    await sendBotReply(sock, jid, `${menuText}${channelLine}`);
-    await clearProcessingReaction(sock, jid);
-    return;
+╭━━━〔 🛡️ SECURITY 〕━━━╮
+│ anticall, antibot, antidelete
+│ anticlean, antiadmin, antisticker
+│ antimention, antitag, antistatus
+│ antilink, botadd, botdel
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+╭━━━〔 👥 GROUP 〕━━━╮
+│ lft, atag, promote, demote
+│ allpmte, vgroup, gf, kick
+│ kickall, htag, tagall, totag
+│ lol, de, del, link, linkreset
+│ resetlink, open, close, pmd
+│ setwelcome, setgoodbye
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+╭━━━〔 🎵 MEDIA 〕━━━╮
+│ song, play, tomp3, toaudio
+│ vv3, mwhatsapp, gcstory, hack
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+╭━━━〔 👑 OWNER / SUDO 〕━━━╮
+│ setsudo, dlsudo, autoadmin
+│ goodnight, gn, autoreaction
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+> © BOSS X • YOUR BROTHER ❤️`;
+
+  try {
+    await sendBotReply(sock, jid, menuText, {
+      templateButtons: config.CHANNEL_URL
+        ? [{
+            index: 1,
+            urlButton: {
+              displayText: "📢 View channel",
+              url: config.CHANNEL_URL
+            }
+          }]
+        : []
+    });
+  } catch (err) {
+    logger.error({ err, jid }, "Menu send failed");
+    await sendBotReply(sock, jid, menuText);
   }
 
+  await clearProcessingReaction(sock, jid);
+  return;
+}
+```
+  
   if (mode === "private" && !canUsePrivateMode) {
     console.log(`⛔ COMMAND BLOCKED: ${command} from ${sender}`);
     await clearProcessingReaction(sock, jid);
