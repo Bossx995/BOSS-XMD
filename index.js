@@ -569,7 +569,7 @@ async function clearProcessingReaction(sock, jid, key = null) {
   if (key?.id && entry.key?.id && key.id !== entry.key.id) return;
   processingReactions.delete(jid);
   try {
-    await (entry.sock || sock).sendMessage(jid, { react: { text: "🪄", key: entry.key } });
+    await (entry.sock || sock).sendMessage(jid, { react: { text: "", key: entry.key } });
   } catch (err) {
     logger.debug?.({ err, jid }, "processing reaction clear failed");
   }
@@ -581,7 +581,10 @@ async function sendBotReply(sock, jid, text, options = {}) {
   const replyOptions = { ...options };
   const currentContext = { ...(replyOptions.contextInfo || {}) };
   replyOptions.contextInfo = getChannelContextInfo(currentContext);
-  return await sendTextSafe(sock, jid, text, replyOptions);
+  const result = await sendTextSafe(sock, jid, text, replyOptions);
+  // Remove the temporary 🪄 reaction from the command as soon as its reply is sent.
+  await clearProcessingReaction(sock, jid);
+  return result;
 }
 
 async function sendTextSafe(sock, jid, text, options = {}) {
@@ -1616,23 +1619,13 @@ ${kickOn ? "🚪 *৩টি warning পূর্ণ হওয়ায় আপনা
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 > © BOSS X • YOUR BROTHER ♥️`;
 
-    try {
-      // Normal menu with a single View channel button. If this Baileys build
-      // rejects template buttons, the fallback below still returns the menu.
-      await sendBotReply(sock, jid, menuText, {
-        templateButtons: config.CHANNEL_URL ? [{
-          index: 1,
-          urlButton: { displayText: "📢 View channel", url: config.CHANNEL_URL }
-        }] : []
-      });
-    } catch (e) {
-      logger.error({ err: e, jid, sender }, "menu send failed");
-      try {
-        await sock.sendMessage(jid, { text: `${menuText}\n\n📢 View channel: ${config.CHANNEL_URL || ""}` });
-      } catch (fallbackError) {
-        logger.error({ err: fallbackError, jid }, "menu fallback send failed");
-      }
-    }
+    // Reliable plain-text menu: avoid unsupported templateButtons that can
+    // fail on some Baileys/WhatsApp builds. WhatsApp auto-links the channel URL.
+    const channelLine = config.CHANNEL_URL
+      ? `\n\n📢 View channel: ${config.CHANNEL_URL}`
+      : "";
+    await sendBotReply(sock, jid, `${menuText}${channelLine}`);
+    await clearProcessingReaction(sock, jid);
     return;
   }
 
