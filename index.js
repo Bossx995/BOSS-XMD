@@ -1676,46 +1676,38 @@ if (command === "menu" || command === "help") {
 
 > © BOSS X • YOUR BROTHER ❤️`;
 
-  try {
-    let botPhoto = null;
-    const botNumber = sock.user?.id;
+  
+try {
+  let botPhoto = null;
+  const botNumber = sock.user?.id;
 
-    if (botNumber) {
-      try {
-        botPhoto = await sock.profilePictureUrl(
-          botNumber,
-          "image"
-        );
-      } catch (photoErr) {
-        logger.warn("Bot profile photo not available");
-      }
-    }
-
-    if (botPhoto) {
-      await sock.sendMessage(jid, {
-        image: { url: botPhoto },
-        caption: menuText
-      });
-    } else {
-      await sendBotReply(sock, jid, menuText);
-    }
-
-    // Send the channel URL separately so the link remains available.
-    if (config.CHANNEL_URL) {
-      await sendBotReply(
-        sock,
-        jid,
-        `📢 BOSS X CHANNEL\n${config.CHANNEL_URL}`
+  if (botNumber) {
+    try {
+      botPhoto = await sock.profilePictureUrl(
+        botNumber,
+        "image"
       );
+    } catch (photoErr) {
+      logger.warn("Bot profile photo not available");
     }
-  } catch (err) {
-    logger.error({ err, jid }, "Menu send failed");
   }
 
-  await clearProcessingReaction(sock, jid);
-  return;
+  if (botPhoto) {
+    await sock.sendMessage(jid, {
+      image: { url: botPhoto },
+      caption: menuText
+    });
+  } else {
+    await sendBotReply(sock, jid, menuText);
+  }
+
+} catch (err) {
+  logger.error({ err, jid }, "Menu send failed");
 }
-  
+
+await clearProcessingReaction(sock, jid);
+return;
+}
   if (mode === "private" && !canUsePrivateMode) {
     console.log(`⛔ COMMAND BLOCKED: ${command} from ${sender}`);
     await clearProcessingReaction(sock, jid);
