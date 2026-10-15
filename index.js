@@ -1664,7 +1664,7 @@ if (command === "menu" || command === "help") {
   await clearProcessingReaction(sock, jid);
   return;
 }
-```
+
   
   if (mode === "private" && !canUsePrivateMode) {
     console.log(`⛔ COMMAND BLOCKED: ${command} from ${sender}`);
