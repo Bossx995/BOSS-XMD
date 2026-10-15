@@ -1678,17 +1678,7 @@ if (command === "menu" || command === "help") {
 > © BOSS X • YOUR BROTHER ❤️`;
 
   try {
-    await sendBotReply(sock, jid, menuText, {
-      templateButtons: config.CHANNEL_URL
-        ? [{
-            index: 1,
-            urlButton: {
-              displayText: "📢 View channel",
-              url: config.CHANNEL_URL
-            }
-          }]
-        : []
-    });
+    await sendBotReply(sock, jid, menuText);
   } catch (err) {
     logger.error({ err, jid }, "Menu send failed");
   }
